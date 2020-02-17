@@ -67,7 +67,7 @@ void update(float dt){
       springForceY[i] = (stringF+dampF)*dirY;
 
       if(i == numV-1){
-        accY[i] = (gravity + 0.5*springForceY[i])/mass; 
+        accY[i] = gravity + (0.5*springForceY[i])/mass; 
         accX[i] = springForceX[i]/mass;
       } else {
         accY[i] = gravity + 0.5*springForceY[i]/mass -  0.5*springForceY[i+1]/mass; 
