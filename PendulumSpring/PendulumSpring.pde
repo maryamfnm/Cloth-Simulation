@@ -58,7 +58,7 @@ float anchorX = 200;
 //float anchorY = ballY1 - restLen;
 
 float mass = 5;
-float gravity = 15;
+float gravity = 20;
 float k = 100; //1 1000
 float kv = 5;
 
@@ -199,102 +199,157 @@ void draw() {
     }
     
     noFill(); 
+    beginShape(TRIANGLE_STRIP);
     for (int i = 0; i < numVX; i++){
       for (int j= 0; j < numVY; j++){
           pushMatrix();
           
           //top left corner
           if(i == 0 && j == 0) {
-                line(position[i][j][0],position[i][j][1], position[i][j+1][0],position[i][j+1][1]);
+                /*line(position[i][j][0],position[i][j][1], position[i][j+1][0],position[i][j+1][1]);
                 line(position[i][j][0],position[i][j][1], position[i+1][j][0],position[i+1][j][1]);
                 translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
+                //sphere(radius);*/
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j+1][0],position[i][j+1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i+1][j][0],position[i+1][j][1]);
                 
           } 
           // first Column
           else if (j == 0  && (i>0 && i<(numVX-1))){
-                line(position[i-1][j][0],position[i-1][j][1],position[i][j][0],position[i][j][1]);
+                /*line(position[i-1][j][0],position[i-1][j][1],position[i][j][0],position[i][j][1]);
                 line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
                 line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
                 translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
+                //sphere(radius);*/
+                vertex(position[i-1][j][0],position[i-1][j][1]);
+                vertex(position[i][j][0],position[i][j][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j+1][0],position[i][j+1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i+1][j][0],position[i+1][j][1]);
                 
           } 
           // right border
           else if (j == numVY-1 && (i>0 && i<numVX-1 )){
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
+                /*line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
                 line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
                 line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
                 translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-          } 
-          // right top corner
-          else if(j == numVY-1 && i == 0){
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-          }
-          // right bottom corner
-          else if(j == numVY-1 && i == numVX-1){
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-          }
-          //bottom border
-          else if((j>0 && j<numVY-1) && i == numVX-1){
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-          }
-          // bottom left corner
-          else if(j == 0 && i == numVY-1){
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-          } 
-          // top boder
-          else if((j>0 && j<numVY-1) && i == 0){
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-          } 
-          else if ((j>0 && j<numVY-1) && (i>0 && i< numVX-1)){
-                // rest of the nodes
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*textureMode(NORMAL);
-                beginShape(QUADS);
-                texture(tile);
+                sphere(radius);*/
                 vertex(position[i][j][0],position[i][j][1]);
                 vertex(position[i][j-1][0],position[i][j-1][1]);
                 
-                texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j+1][0],position[i][j+1][1]);
-                
-                texture(tile);
                 vertex(position[i][j][0],position[i][j][1]);
                 vertex(position[i-1][j][0],position[i-1][j][1]);
                 
-                texture(tile);
                 vertex(position[i][j][0],position[i][j][1]);
                 vertex(position[i+1][j][0],position[i+1][j][1]);
-                endShape();*/
+          } 
+          // right top corner
+          else if(j == numVY-1 && i == 0){
+                /*line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
+                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
+                translate(position[i][j][0],position[i][j][1]);
+                /*sphere(radius);*/
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j-1][0],position[i][j-1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i+1][j][0],position[i+1][j][1]);
+          }
+          // right bottom corner
+          else if(j == numVY-1 && i == numVX-1){
+                /*line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
+                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
+                translate(position[i][j][0],position[i][j][1]);
+                /*sphere(radius);*/
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i-1][j][0],position[i-1][j][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j-1][0],position[i][j-1][1]);
+          }
+          //bottom border
+          else if((j>0 && j<numVY-1) && i == numVX-1){
+                /*line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
+                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
+                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
+                translate(position[i][j][0],position[i][j][1]);
+                /*sphere(radius);*/
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j-1][0],position[i][j-1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j+1][0],position[i][j+1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i-1][j][0],position[i-1][j][1]);
+          }
+          // bottom left corner
+          else if(j == 0 && i == numVY-1){
+                /*line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
+                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
+                translate(position[i][j][0],position[i][j][1]);
+                /*sphere(radius);*/
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i-1][j][0],position[i-1][j][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j+1][0],position[i][j+1][1]);
+                
+          } 
+          // top boder
+          else if((j>0 && j<numVY-1) && i == 0){
+                /*line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
+                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
+                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);*/
+                //beginShape(TRIANGLE_STRIP);
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j+1][0],position[i][j+1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j-1][0],position[i][j-1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i+1][j][0],position[i+1][j][1]);
+                //endShape();
+                //translate(position[i][j][0],position[i][j][1]);
+                //sphere(radius);
+          } 
+          else if ((j>0 && j<numVY-1) && (i>0 && i< numVX-1)){
+                // rest of the nodes
+                /*line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
+                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
+                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
+                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
+                translate(position[i][j][0],position[i][j][1]);
+                sphere(radius);*/
+                /*textureMode(NORMAL);*/
+                
+                //texture(tile);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j-1][0],position[i][j-1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i][j+1][0],position[i][j+1][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i-1][j][0],position[i-1][j][1]);
+                
+                vertex(position[i][j][0],position[i][j][1]);
+                vertex(position[i+1][j][0],position[i+1][j][1]);
             
           }
             
           popMatrix();
       }
     }
+    endShape();
 }
