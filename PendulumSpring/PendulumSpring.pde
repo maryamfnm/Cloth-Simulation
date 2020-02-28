@@ -1,112 +1,107 @@
 float floor = 700;
 float restLen = 30;
-float[][][] position = new float[10][10][2];
-PImage img, tile;
+float[][][] position = new float[15][15][3];
+PImage img;
 float[] accX = new float[300];
 float[] accY = new float[300];
 float[] springForceX = new float[300];
 float[] springForceY = new float[300];
-float p = 1.225, c_d = 1, velx_air=1, vely_air=1;
+float p = 1.225, c_d = 1, velx_air=2, vely_air=2, velz_air=1 ;
+float sphereX = 382, sphereY =209, sphereZ =200,sphereR = 50, radius = 5;
+float mass = 3, gravity = 1, k = 10, kv =10;
+int numVX = 15;
+int numVY = 15;
+float[][][] forces = new float[15][15][3];
+float[][][] velocity = new float[15][15][3];
 
+Camera camera;
 void setup() {
-  size(800, 800, P3D);
+  size(1000, 1000, P3D);
+  camera = new Camera();
   surface.setTitle("Cloth Simulation");
-  /*img = loadImage("texture.jpg");
-  noStroke();
-  tile = createImage(img.width/300, img.height/300, RGB);*/
-  
-  for (int i=0; i < 10; i++){
-    for (int j = 0; j < 10; j++){  
+  img = loadImage("texture2.jpg");
+  for (int i=0; i < 15; i++){
+    for (int j = 0; j < 15; j++){  
+      
       if (i == 0){
         if (j == 0){
-          position[i][j][0] = 180;
+          position[i][j][0] = 380;
+          position[i][j][2] = 150 ;
         }
         else {
-          position[i][j][0] = position[i][j-1][0] + restLen;
+          position[i][j][0] = position[i][j-1][0] ;//+ restLen;
+          position[i][j][2] = position[i][j-1][2] + restLen ;
         }
-        position[i][j][1] = 150;
+        position[i][j][1] = 50;
+        
+        
       } else if (j==0 && i>0){
         position[i][j][0] = 180;
-        position[i][j][1] = position[i-1][j][1] + restLen;
+        position[i][j][1] = position[i-1][j][1] ;//+ restLen;
+        position[i][j][2] = position[i-1][j][2] + restLen;
       }
       else {
-        position[i][j][0] = position[i][j-1][0] + restLen;
-        position[i][j][1] = position[i-1][j][1] + restLen;
+        position[i][j][0] = position[i][j-1][0] ;//+ restLen;
+        position[i][j][1] = position[i-1][j][1] ;//+ restLen;
+        position[i][j][2] = position[i][j-1][2] + restLen;
       }
+      velocity[i][j][0]= 0.0;
+      velocity[i][j][1]= 0.0;
+      velocity[i][j][2]= 0.0;
     }
   }
   
 }
 
+void keyPressed()
+{
+  camera.HandleKeyPressed();
+}
 
-
-/*float ballX1 = 180, ballX2 = ballX1 + restLen, ballX3 = ballX2 + restLen, ballX4 = ballX3 + restLen, ballX5 = ballX4 + restLen;
-float ballY1 = 150, ballY2 = 150 , ballY3 = 150, ballY4 = 150, ballY5 = 150;
-
-float ballX6 = 180, ballX7 = ballX6 + restLen, ballX8 = ballX7 + restLen, ballX9 = ballX8 + restLen, ballX10 = ballX9 + restLen;
-float ballY6 = ballY1 + restLen , ballY7 = ballY2 + restLen , ballY8 = ballY3 + restLen, ballY9 = ballY4 + restLen, ballY10 = ballY5 + restLen;
-
-float ballX11 = 180, ballX12 = ballX11 + restLen, ballX13 = ballX12 + restLen, ballX14 = ballX13 + restLen, ballX15 = ballX14 + restLen;
-float ballY11 = ballY6 + restLen, ballY12 = ballY7 + restLen , ballY13 = ballY8 + restLen, ballY14 = ballY9 + restLen, ballY15 = ballY10 + restLen;
-
-float ballX16 = 180, ballX17 = ballX16 + restLen, ballX18 = ballX17 + restLen, ballX19 = ballX18 + restLen, ballX20 = ballX19 + restLen;
-float ballY16 = ballY11 + restLen, ballY17 = ballY12 + restLen , ballY18 = ballY13 + restLen, ballY19 = ballY14 + restLen, ballY20 = ballY15 + restLen;
-
-float ballX21 = 180, ballX22 = ballX21 + restLen, ballX23 = ballX22 + restLen, ballX24 = ballX23 + restLen, ballX25 = ballX24 + restLen;
-float ballY21 = ballY16 + restLen, ballY22 = ballY17 + restLen , ballY23 = ballY18 + restLen, ballY24 = ballY19 + restLen, ballY25 = ballY20 + restLen;
-*/
-float radius = 5;
-float anchorX = 200;
-
-float mass = 10;
-float gravity = 40;
-float k = 20; //1 1000
-float kv = 1;
-
-/*float[][][] position = {{{ballX1,ballY1}, {ballX2,ballY2},{ballX3,ballY3},{ballX4,ballY4},{ballX5,ballY5}},
-                        {{ballX6,ballY6}, {ballX7,ballY7},{ballX8,ballY8},{ballX9,ballY9},{ballX10,ballY10}},
-                        {{ballX11,ballY11}, {ballX12,ballY12},{ballX13,ballY13},{ballX14,ballY14},{ballX15,ballY15}},
-                        {{ballX16,ballY16}, {ballX17,ballY17},{ballX18,ballY18},{ballX19,ballY19},{ballX20,ballY20}},
-                        {{ballX21,ballY21}, {ballX22,ballY22},{ballX23,ballY23},{ballX24,ballY24},{ballX25,ballY25}}};
-
-float[][][] velocity = {{{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0}}};
-*/                       
-float[][][] velocity = {{{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}},
-                        {{0,0}, {0,0},{0,0},{0,0},{0,0},{0,0}, {0,0},{0,0},{0,0},{0,0}}};
-
-
-int numVX = 10;
-int numVY = 10;
+void keyReleased()
+{
+  camera.HandleKeyReleased();
+}
 
 void update(float dt){
   for(int i = 0; i < numVX; i++ ){
-    
     accX[i] = 0;
     accY[i] = 0;
   }
+  for (int i = 0; i < numVX ; i++){ //<>//
+    for (int j=0; j< numVY; j++) {
+     force(i, j,dt);
+    }
+  }
   for (int i = 0; i < numVX ; i++){
     for (int j=0; j< numVY; j++) {
-      force(i, j,dt);
-      position[i][j][0] += velocity[i][j][0]*dt;      // Update positions x
-      
+     position[i][j][0] += velocity[i][j][0]*dt;      // Update positions x
+     position[i][j][2] += velocity[i][j][2]*dt;
+     
       if((i == 0 && j == 0) || (i == 0 && j == numVY-1) || (i ==0 && (0<j && j<numVY-1))){  // Update positions y
         position[i][j][1] += 0;
       } else {
-        position[i][j][1] += (gravity*dt + velocity[i][j][1])*dt;
-      }
+        position[i][j][1] += (/*gravity*dt +*/ velocity[i][j][1])*dt;
+      } 
       
+      PVector clothPos = new PVector(position[i][j][0],position[i][j][1],position[i][j][2]);
+      PVector spherePos = new PVector(sphereX,sphereY,sphereZ);
+      PVector v = new PVector(velocity[i][j][0],velocity[i][j][1],velocity[i][j][2]);
+      
+      float distance = dist(position[i][j][0],position[i][j][1],position[i][j][2],sphereX,sphereY,sphereZ);
+      
+      if (distance < sphereR+0.09){
+        PVector sphereNormal = new PVector(-(spherePos.x+ - clothPos.x), -(spherePos.y - clothPos.y),-(spherePos.z - clothPos.z)); //sphere normal //<>//
+        PVector normalized = sphereNormal.normalize(); 
+        float vn = v.dot(normalized);
+        PVector bounce = new PVector(1.5*vn*normalized.x, 1.5*vn*normalized.y, 1.5*vn*normalized.z);
+        println("spehresPos: " + spherePos.x + "  " + spherePos.y + "  " + spherePos.z);
+        println("clothPos: " + clothPos.x + "  " + clothPos.y + "  " + clothPos.z);
+        v.sub(bounce);
+        PVector newNormal = new PVector(sphereNormal.x*(0.1 + sphereR - distance), sphereNormal.y*(0.1 + sphereR - distance),sphereNormal.z*(0.1 + sphereR - distance));
+        clothPos.add(newNormal); // move out
+        
+      }
       if (position[i][j][1]+radius > floor){      // Collision detection with ground
         velocity[i][j][1] *= -.9;
         position[i][j][1] = floor - radius;
@@ -114,310 +109,207 @@ void update(float dt){
     }
   }
 }
-float[][][] calculate_force_velocity(int i, int j, int n, int m, float dt, int coefficient){
-      coefficient = 1;
-      float sx, sy;
-      sx = (position[i][j][0] - position[n][m][0]);
-      sy = (position[i][j][1] - position[n][m][1]);
-      float stringLength = sqrt(sx*sx + sy*sy);
-      float vx = (velocity[i][j][0]*sx/stringLength - velocity[n][m][0]*sx/stringLength);
-      float vy = (velocity[i][j][1]*sy/stringLength - velocity[n][m][1]*sy/stringLength);
-      float projVel = vx + vy;
-      float dampForce = -kv*(projVel);
-      float F = -k*coefficient*(stringLength - restLen) + dampForce;
-      float acc = (0.5*F)/mass;
-      velocity[i][j][0] += acc*dt*sx/stringLength;
-      velocity[i][j][1] += acc*dt*sy/stringLength;
-      velocity[n][m][0] -= acc*dt*sx/stringLength;
-      velocity[n][m][1] -= acc*dt*sy/stringLength;
-      
-      float[][][] forceVelocityArray = new float[1][3][1];
-      forceVelocityArray[0][0][0] = F;
-      forceVelocityArray[0][1][0] = velocity[i][j][0];
-      forceVelocityArray[0][2][0] = velocity[i][j][1];
-      
-      return forceVelocityArray;
-     
-}
 
-PVector aerodynamicForce(PVector[] pos,float[]vel){
-      
-      PVector r2_r1 = pos[1].sub(pos[0]); //<>//
+PVector drag(PVector[] pos){          // calculating drag force
+      PVector r2_r1 = pos[1].sub(pos[0]);
       PVector r3_r1 = pos[2].sub(pos[0]);
       PVector cross_product_vector = r2_r1.cross(r3_r1);
-      float len = sqrt(cross_product_vector.x*cross_product_vector.x + cross_product_vector.y*cross_product_vector.y);
+      float len = sqrt(cross_product_vector.x*cross_product_vector.x + cross_product_vector.y*cross_product_vector.y + cross_product_vector.z*cross_product_vector.z);
       PVector normalVec = cross_product_vector.div(len);
-      
       float a_zero = 0.5*(len);
-      float vn = normalVec.x*vel[0] + normalVec.y*vel[1];
-      float normVelocity = sqrt(vel[0]*vel[0] + vel[1]*vel[1]);
+      
+      float vel_x = (pos[0].x + pos[1].x + pos[2].x)/3;
+      float vel_y = (pos[0].y + pos[1].y + pos[2].y)/3;
+      float vel_z = (pos[0].z + pos[1].z + pos[2].z)/3;
+      PVector total_velocity = new PVector(vel_x - velx_air, vel_y - vely_air, vel_z - velz_air);
+      float vn = normalVec.x*total_velocity.x + normalVec.y*total_velocity.y + normalVec.z*total_velocity.z;
+      float normVelocity = sqrt(total_velocity.x*total_velocity.x + total_velocity.y*total_velocity.y + total_velocity.z*total_velocity.z);
       float area = a_zero*(vn/normVelocity);
       
       PVector Aerodynamic_Force = new PVector((-0.5*p*(normVelocity*normVelocity)*c_d*area)*normalVec.x,
-                                              (-0.5*p*(normVelocity*normVelocity)*c_d*area)*normalVec.y); 
+                                              (-0.5*p*(normVelocity*normVelocity)*c_d*area)*normalVec.y,
+                                              (-0.5*p*(normVelocity*normVelocity)*c_d*area)*normalVec.z); 
       return Aerodynamic_Force;
 }
 
-void force(int i, int j, float dt){
-      //top left corner
+void calculate_force(float dragForce,int i, int j, int n, int m, float dt){      // Calculate the force and velocity for each mass 
+      float sx, sy, sz;
+      sx = (position[i][j][0] - position[n][m][0]);
+      sy = (position[i][j][1] - position[n][m][1]);
+      sz = (position[i][j][2] - position[n][m][2]);
+      float stringLength = sqrt(sx*sx + sy*sy + sz*sz);
+      float vx = (velocity[i][j][0]*sx/stringLength - velocity[n][m][0]*sx/stringLength);
+      float vy = (velocity[i][j][1]*sy/stringLength - velocity[n][m][1]*sy/stringLength);
+      float vz = (velocity[i][j][2]*sz/stringLength - velocity[n][m][2]*sz/stringLength);
+      float projVel = vx + vy + vz;
+      float dampForce = -kv*(projVel);
+      float F_X = (-k*(stringLength - restLen) + dampForce + dragForce)*sx/stringLength;
+      float F_Y = (-k*(stringLength - restLen) + dampForce + dragForce)*sy/stringLength;
+      float F_Z = (-k*(stringLength - restLen) + dampForce + dragForce)*sz/stringLength;
+      float[] F = new float[3];
+      F[0] = F_X;  F[1] = F_Y; F[2] = F_Z;
       
-      if(i == 0 && j == 0) {
-        //calculate_force_velocity(i,j,i+1,j,dt,-1);
-        //calculate_force_velocity(i,j,i,j+1,dt,-1);
-        velocity[i][j][0] = 0;
-        velocity[i][j][1] = 0;
-      }
+      float accX = (0.5*F_X)/mass;
+      float accY = gravity  + (0.5*F_Y)/mass;
+      float accZ = (0.5*F_Z)/mass;
+      velocity[i][j][0] += accX*dt;
+      velocity[i][j][1] += accY*dt;
+      velocity[i][j][2] += accZ*dt;
+}
+
+void force(int i, int j, float dt){
       // first Column
-      else if (j == 0  && (i>0 && i<(numVX-1))){
-       float[][][] force_velocity_array_1 = calculate_force_velocity(i,j,i-1,j,dt,1);
-       float[][][] force_velocity_array_2 = calculate_force_velocity(i,j,i+1,j,dt,-1); 
-       float[][][] force_velocity_array_3 = calculate_force_velocity(i,j,i,j+1,dt,-1); 
+      if (j == 0  && (i>0 && i<(numVX-1))){
+       PVector t1_r1 = new PVector(i, j);
+       PVector t1_r2 = new PVector(i-1, j);
+       PVector t1_r3 = new PVector(i, j+1);
+       PVector[] position_vertecies_1 = {t1_r1, t1_r2, t1_r3};
+       PVector drag1 = drag(position_vertecies_1);
+       float d1 = (drag1.x + drag1.y + drag1.z)/3;
        
-       float vel_x = (force_velocity_array_1[0][1][0] + force_velocity_array_2[0][1][0] + force_velocity_array_3[0][1][0])/3; //<>//
-       float vel_y = (force_velocity_array_1[0][2][0] + force_velocity_array_2[0][2][0] + force_velocity_array_3[0][2][0])/3;
-       float[] total_velocity = {vel_x - velx_air, vel_y - vely_air};
+       PVector t2_r1 = new PVector(i, j);
+       PVector t2_r2 = new PVector(i+1, j);
+       PVector t2_r3 = new PVector(i, j+1);
+       PVector[] position_vertecies_2 = {t2_r1, t2_r2, t2_r3};
+       PVector drag2 = drag(position_vertecies_2);
+       float d2 = (drag2.x + drag2.y+ drag1.z)/3;
        
-       PVector r1 = new PVector(i-1, j);
-       PVector r2 = new PVector(i+1, j);
-       PVector r3 = new PVector(i, j+1);
-       PVector[] position_vertecies = {r1, r2, r3};
-       PVector f_aero = aerodynamicForce(position_vertecies,total_velocity); //<>//
-       
-       
+       calculate_force(d1,i,j,i-1,j,dt);
+       calculate_force(d2,i,j,i+1,j,dt); 
+       calculate_force(d1+d2,i,j,i,j+1,dt);
       } 
       // right border
       else if (j == numVY-1 && (i>0 && i<numVX-1 )){
-        float[][][] force_velocity_array_1 = calculate_force_velocity(i,j,i-1,j,dt,1);
-        float[][][] force_velocity_array_2 = calculate_force_velocity(i,j,i+1,j,dt,-1);
-        float[][][] force_velocity_array_3 = calculate_force_velocity(i,j,i,j-1,dt,1); 
+        PVector t1_r1 = new PVector(i, j);
+        PVector t1_r2 = new PVector(i-1, j);
+        PVector t1_r3 = new PVector(i, j-1);
+        PVector[] position_vertecies_1 = {t1_r1, t1_r2, t1_r3};
+        PVector drag1 = drag(position_vertecies_1);
+        float d1 = (drag1.x + drag1.y + drag1.z)/3;
+       
+        PVector t2_r1 = new PVector(i, j);
+        PVector t2_r2 = new PVector(i+1, j);
+        PVector t2_r3 = new PVector(i, j-1);
+        PVector[] position_vertecies_2 = {t2_r1, t2_r2, t2_r3};
+        PVector drag2 = drag(position_vertecies_2);
+        float d2 = (drag2.x + drag2.y + drag1.z)/3;
+        
+        calculate_force(d1,i,j,i-1,j,dt);
+        calculate_force(d2,i,j,i+1,j,dt);
+        calculate_force(d1+d2,i,j,i,j-1,dt);
       } 
-      // right top corner
-      else if(j == numVY-1 && i == 0){
-        //calculate_force_velocity(i,j,i+1,j,dt,-1);
-        //calculate_force_velocity(i,j,i,j-1,dt,1);
-        velocity[i][j][0] = 0;
-        velocity[i][j][1] = 0;
-        }
       // right bottom corner
       else if(j == numVY-1 && i == numVX-1){
-        float[][][] force_velocity_array_1 = calculate_force_velocity(i,j,i-1,j,dt,1);
-        float[][][] force_velocity_array_2 = calculate_force_velocity(i,j,i,j-1,dt,1);
+        PVector t1_r1 = new PVector(i, j);
+        PVector t1_r2 = new PVector(i-1, j);
+        PVector t1_r3 = new PVector(i, j-1);
+        PVector[] position_vertecies_1 = {t1_r1, t1_r2, t1_r3};
+        PVector drag1 = drag(position_vertecies_1);
+        float d1 = (drag1.x + drag1.y + drag1.z)/3;
+       
+        calculate_force(d1,i,j,i-1,j,dt);
+        calculate_force(d1,i,j,i,j-1,dt);
       }
       //bottom border
       else if((j>0 && j<numVY-1) && i == numVX-1){
-        float[][][] force_velocity_array_1 = calculate_force_velocity(i,j,i-1,j,dt,1);
-        float[][][] force_velocity_array_2 = calculate_force_velocity(i,j,i,j+1,dt,-1);
-        float[][][] force_velocity_array_3 = calculate_force_velocity(i,j,i,j-1,dt,1);
+        PVector t1_r1 = new PVector(i, j);
+        PVector t1_r2 = new PVector(i-1, j);
+        PVector t1_r3 = new PVector(i, j-1);
+        PVector[] position_vertecies_1 = {t1_r1, t1_r2, t1_r3};
+        PVector drag1 = drag(position_vertecies_1);
+        float d1 = (drag1.x + drag1.y+ drag1.z)/3;
+       
+        PVector t2_r1 = new PVector(i, j);
+        PVector t2_r2 = new PVector(i-1, j);
+        PVector t2_r3 = new PVector(i, j+1);
+        PVector[] position_vertecies_2 = {t2_r1, t2_r2, t2_r3};
+        PVector drag2 = drag(position_vertecies_2);
+        float d2 = (drag2.x + drag2.y+ drag1.z)/3;
+        calculate_force(d1+d2,i,j,i-1,j,dt);
+        calculate_force(d2,i,j,i,j+1,dt);
+        calculate_force(d1,i,j,i,j-1,dt);
       }
       // bottom left corner
       else if(j == 0 && i == numVX-1){
-        float[][][] force_velocity_array_1 = calculate_force_velocity(i,j,i-1,j,dt,1);
-        float[][][] force_velocity_array_2 = calculate_force_velocity(i,j,i,j+1,dt,-1);
-      } 
-      // top boder
-      else if((j>0 && j<numVY-1) && i == 0){
-        //calculate_force_velocity(i,j,i+1,j,dt,-1);
-        //calculate_force_velocity(i,j,i,j+1,dt,-1);
-        //calculate_force_velocity(i,j,i,j-1,dt,1);
-        velocity[i][j][0] = 0;
-        velocity[i][j][1] = 0;
-      } 
+        PVector t1_r1 = new PVector(i, j);
+        PVector t1_r2 = new PVector(i-1, j);
+        PVector t1_r3 = new PVector(i, j+1);
+        PVector[] position_vertecies_1 = {t1_r1, t1_r2, t1_r3};
+        PVector drag1 = drag(position_vertecies_1);
+        float d1 = (drag1.x + drag1.y+ drag1.z)/3;
+        calculate_force(d1,i,j,i-1,j,dt);
+        calculate_force(d1,i,j,i,j+1,dt);
+      }
       // rest of the nodes
       else if ((j>0 && j<numVY-1) && (i>0 && i< numVX-1)){
-        float[][][] force_velocity_array_1 = calculate_force_velocity(i,j,i+1,j,dt,-1);
-        float[][][] force_velocity_array_2 = calculate_force_velocity(i,j,i,j+1,dt,-1);
-        float[][][] force_velocity_array_3 = calculate_force_velocity(i,j,i,j-1,dt,1);
-        float[][][] force_velocity_array_4 = calculate_force_velocity(i,j,i-1,j,dt,1);
+        PVector t1_r1 = new PVector(i, j);
+        PVector t1_r2 = new PVector(i+1, j);
+        PVector t1_r3 = new PVector(i, j-1);
+        PVector[] position_vertecies_1 = {t1_r1, t1_r2, t1_r3};
+        PVector drag1 = drag(position_vertecies_1);
+        float d1 = (drag1.x + drag1.y+ drag1.z)/3;
+       
+        PVector t2_r1 = new PVector(i, j);
+        PVector t2_r2 = new PVector(i+1, j);
+        PVector t2_r3 = new PVector(i, j+1);
+        PVector[] position_vertecies_2 = {t2_r1, t2_r2, t2_r3};
+        PVector drag2 = drag(position_vertecies_2);
+        float d2 = (drag2.x + drag2.y+ drag1.z)/3;
+        
+        PVector t3_r1 = new PVector(i, j);
+        PVector t3_r2 = new PVector(i-1, j);
+        PVector t3_r3 = new PVector(i, j-1);
+        PVector[] position_vertecies_3 = {t3_r1, t3_r2, t3_r3};
+        PVector drag3 = drag(position_vertecies_3);
+        float d3 = (drag3.x + drag3.y+ drag1.z)/3;
+        
+        PVector t4_r1 = new PVector(i, j);
+        PVector t4_r2 = new PVector(i-1, j);
+        PVector t4_r3 = new PVector(i, j+1);
+        PVector[] position_vertecies_4 = {t4_r1, t4_r2, t4_r3};
+        PVector drag4 = drag(position_vertecies_4);
+        float d4 = (drag4.x + drag4.y+ drag1.z)/3;
+         
+        calculate_force(d1+d2,i,j,i+1,j,dt);
+        calculate_force(d2+d4,i,j,i,j+1,dt);
+        calculate_force(d1+d3,i,j,i,j-1,dt);
+        calculate_force(d3+d4,i,j,i-1,j,dt);
       }
 }
 
 void draw() {
     background(255,255,255);
     for (int i = 0; i < 10; i++){
-      update(1/(1.0*frameRate));
+      update(1/(3.0*frameRate));
     }
+    noLights();
     
-    noFill(); 
-    
-    for (int i = 0; i < numVX; i++){
-      for (int j= 0; j < numVY; j++){
+    camera.Update( 1.0/frameRate );
+ 
+    noFill();
+    noStroke();  
+    for (int i = 0; i < numVX-1; i++){
+      
+      for (int j= 0; j < numVY-1; j++){
           pushMatrix();
-          
-          //top left corner
-          if(i == 0 && j == 0) {
-                line(position[i][j][0],position[i][j][1], position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1], position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                
-                /*beginShape();
-                textureMode(NORMAL);
-                texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j+1][0],position[i][j+1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i+1][j][0],position[i+1][j][1]);
-                endShape();*/
-                
-          } 
-          // first Column
-          else if (j == 0  && (i>0 && i<(numVX-1))){
-                line(position[i-1][j][0],position[i-1][j][1],position[i][j][0],position[i][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i-1][j][0],position[i-1][j][1]);
-                vertex(position[i][j][0],position[i][j][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j+1][0],position[i][j+1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i+1][j][0],position[i+1][j][1]);
-                endShape();*/
-                
-          } 
-          // right border
-          else if (j == numVY-1 && (i>0 && i<numVX-1 )){
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j-1][0],position[i][j-1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i-1][j][0],position[i-1][j][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i+1][j][0],position[i+1][j][1]);
-                endShape();*/
-          } 
-          // right top corner
-          else if(j == numVY-1 && i == 0){
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j-1][0],position[i][j-1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i+1][j][0],position[i+1][j][1]);
-                endShape();*/
-          }
-          // right bottom corner
-          else if(j == numVY-1 && i == numVX-1){
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i-1][j][0],position[i-1][j][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j-1][0],position[i][j-1][1]);
-                endShape();*/
-          }
-          //bottom border
-          else if((j>0 && j<numVY-1) && i == numVX-1){
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j-1][0],position[i][j-1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j+1][0],position[i][j+1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i-1][j][0],position[i-1][j][1]);
-                endShape();*/
-          }
-          // bottom left corner
-          else if(j == 0 && i == numVY-1){
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i-1][j][0],position[i-1][j][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j+1][0],position[i][j+1][1]);
-                endShape();*/
-          } 
-          // top boder
-          else if((j>0 && j<numVY-1) && i == 0){
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j+1][0],position[i][j+1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j-1][0],position[i][j-1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i+1][j][0],position[i+1][j][1]);
-                endShape();*/
-                
-          } 
-          else if ((j>0 && j<numVY-1) && (i>0 && i< numVX-1)){
-                // rest of the nodes
-                line(position[i][j][0],position[i][j][1],position[i][j-1][0],position[i][j-1][1]);
-                line(position[i][j][0],position[i][j][1],position[i][j+1][0],position[i][j+1][1]);
-                line(position[i][j][0],position[i][j][1],position[i-1][j][0],position[i-1][j][1]);
-                line(position[i][j][0],position[i][j][1],position[i+1][j][0],position[i+1][j][1]);
-                translate(position[i][j][0],position[i][j][1]);
-                sphere(radius);
-                /*beginShape();
-                //textureMode(NORMAL);
-                //texture(tile);
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j-1][0],position[i][j-1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i][j+1][0],position[i][j+1][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i-1][j][0],position[i-1][j][1]);
-                
-                vertex(position[i][j][0],position[i][j][1]);
-                vertex(position[i+1][j][0],position[i+1][j][1]);
-                endShape();*/
-          }
-            
+          textureMode(NORMAL);
+          beginShape(QUAD);
+          texture(img);
+          float u1 = map(i, 0, numVX, 0, 1);
+          float v1 = map(j+1, 0, numVY, 0, 1);
+          float u2 = map(i+1, 0, numVX, 0, 1);
+          float v2 = map(j, 0, numVY, 0, 1);
+          vertex(position[i][j][0],position[i][j][1],position[i][j][2], u1,v2);
+          vertex(position[i][j+1][0],position[i][j+1][1], position[i][j+1][2],u1,v1);
+          vertex(position[i+1][j+1][0],position[i+1][j+1][1], position[i+1][j+1][2],u2,v1);
+          vertex(position[i+1][j][0],position[i+1][j][1], position[i+1][j][2],u2,v2);
+          endShape();
           popMatrix();
       }
     }
-    
+    stroke(0);
+    translate(sphereX,sphereY,sphereZ);
+    fill(0, 163, 102);
+    sphere(sphereR); 
 }
+    
