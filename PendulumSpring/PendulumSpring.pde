@@ -81,7 +81,7 @@ void update(float dt){
       if((i == 0 && j == 0) || (i == 0 && j == numVY-1) || (i ==0 && (0<j && j<numVY-1))){  // Update positions y
         position[i][j][1] += 0;
       } else {
-        position[i][j][1] += (/*gravity*dt +*/ velocity[i][j][1])*dt;
+        position[i][j][1] += ( velocity[i][j][1])*dt;
       } 
       
       PVector clothPos = new PVector(position[i][j][0],position[i][j][1],position[i][j][2]);
